@@ -438,7 +438,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         n_requests,
         function,
     ) -> OpenAIQueryResponse:
-        _LOGGER.info("executing function")
         function_executor = get_function_executor(function["function"]["type"])
 
         try:
@@ -457,7 +456,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
                 "content": str(result),
             }
         )
-        _LOGGER.info("function executed %s", message.function_call.name, str(result))
         return await self.query(user_input, messages, exposed_entities, n_requests)
 
     async def execute_tool_calls(
