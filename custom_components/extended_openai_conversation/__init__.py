@@ -203,7 +203,8 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
                 return conversation.ConversationResult(
                     response=intent_response, conversation_id=conversation_id
                 )
-            messages.append(system_message) 
+            if len(messages) == 0:
+                messages.append(system_message) 
         user_message = {"role": "user", "content": user_input.text}
         if self.entry.options.get(CONF_ATTACH_USERNAME, DEFAULT_ATTACH_USERNAME):
             user = user_input.context.user_id
@@ -352,7 +353,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("about to make a query")
+        _LOGGER.error("about to make a query %s", user_input.conversation_id)
         """Process a sentence."""
         model = self.entry.options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL)
         max_tokens = self.entry.options.get(CONF_MAX_TOKENS, DEFAULT_MAX_TOKENS)
