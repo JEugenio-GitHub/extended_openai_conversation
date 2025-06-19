@@ -183,6 +183,8 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             conversation_id = self.default_conversation_id
             try:
                 messages = self.history[self.default_conversation_id]
+                _LOGGER.error("getting the history")
+                _LOGGER.error(self.history[self.default_conversation_id])
             except:
                 _LOGGER.error("Error getting history: %s", err)
                 messages = []
@@ -235,6 +237,8 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
 
         messages.append(query_response.message.model_dump(exclude_none=True))
         self.history[conversation_id] = messages
+        _LOGGER.error("setting the history")
+        _LOGGER.error(self.history[conversation_id])
 
         self.hass.bus.async_fire(
             EVENT_CONVERSATION_FINISHED,
