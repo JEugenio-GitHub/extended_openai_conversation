@@ -140,6 +140,9 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         base_url = entry.data.get(CONF_BASE_URL)
         self.default_conversation_id = "V2JY2JWR4EY5A40WRPKHRD48V2"
         self.history[self.default_conversation_id] = []
+
+        _LOGGER.error("About to initialize the agent")
+        _LOGGER.error(self.history[self.default_conversation_id])
  
         if is_azure(base_url):
             self.client = AsyncAzureOpenAI(
