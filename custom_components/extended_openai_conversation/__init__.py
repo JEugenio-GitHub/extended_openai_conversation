@@ -138,6 +138,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         self.entry = entry
         self.history: dict[str, list[dict]] = {}
         base_url = entry.data.get(CONF_BASE_URL)
+        self.default_conversation_id = "V2JY2JWR4EY5A40WRPKHRD48V2"
  
         if is_azure(base_url):
             self.client = AsyncAzureOpenAI(
@@ -174,9 +175,20 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         else:
             # conversation_id = ulid.ulid()
             # use the default conversation id  and load messages to maintain history during voice conversations
-            default_conversation_id = "V2JY2JWR4EY5A40WRPKHRD48V2"
-            user_input.conversation_id = default_conversation_id
-            messages = self.history[default_conversation_id]
+            user_input.conversation_id = self.default_conversation_id
+            try:
+                messages = self.history[self.default_conversation_id]
+            except TemplateError as err:
+                _LOGGER.error("Error getting history: %s", err)
+                intent_response = intent.IntentResponse(language=user_input.language)
+                intent_response.async_set_error(
+                    intent.IntentResponseErrorCode.UNKNOWN,
+                    f"Sorry, I had a problem with my template: {err}",
+                )
+                return conversation.ConversationResult(
+                    response=intent_response, conversation_id=conversation_id
+                )
+        
             try:
                 system_message = self._generate_system_message(
                     exposed_entities, user_input
