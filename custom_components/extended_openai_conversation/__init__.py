@@ -258,6 +258,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
     def _generate_system_message(
         self, exposed_entities, user_input: conversation.ConversationInput
     ):
+        _LOGGER.error("generating the system message")
         raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
         prompt = self._async_generate_prompt(raw_prompt, exposed_entities, user_input)
         return {"role": "system", "content": prompt}
@@ -279,6 +280,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         )
 
     def get_exposed_entities(self):
+        _LOGGER.error("getting the exposed entities")
         states = [
             state
             for state in self.hass.states.async_all()
@@ -305,6 +307,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         return exposed_entities
 
     def get_functions(self):
+        _LOGGER.error("getting the functions")
         try:
             function = self.entry.options.get(CONF_FUNCTIONS)
             result = yaml.safe_load(function) if function else DEFAULT_CONF_FUNCTIONS
@@ -351,6 +354,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
+        _LOGGER.error("making a query")
         """Process a sentence."""
         model = self.entry.options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL)
         max_tokens = self.entry.options.get(CONF_MAX_TOKENS, DEFAULT_MAX_TOKENS)
@@ -419,6 +423,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
+        _LOGGER.error("executing a function call")
         function_name = message.function_call.name
         function = next(
             (s for s in self.get_functions() if s["spec"]["name"] == function_name),
@@ -444,6 +449,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         n_requests,
         function,
     ) -> OpenAIQueryResponse:
+        _LOGGER.error("executing a function")
         function_executor = get_function_executor(function["function"]["type"])
 
         try:
@@ -472,6 +478,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
+        _LOGGER.error("executing tool calls")
         messages.append(message.model_dump(exclude_none=True))
         for tool in message.tool_calls:
             function_name = tool.function.name
@@ -506,6 +513,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         function,
     ) -> OpenAIQueryResponse:
+        _LOGGER.error("executing tool function")
         function_executor = get_function_executor(function["function"]["type"])
 
         try:
