@@ -140,9 +140,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         base_url = entry.data.get(CONF_BASE_URL)
         self.default_conversation_id = "V2JY2JWR4EY5A40WRPKHRD48V2"
         self.history[self.default_conversation_id] = []
-
-        _LOGGER.error("About to initialize the agent")
-        _LOGGER.error(self.history[self.default_conversation_id])
  
         if is_azure(base_url):
             self.client = AsyncAzureOpenAI(
@@ -183,8 +180,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
             conversation_id = self.default_conversation_id
             try:
                 messages = self.history[self.default_conversation_id]
-                _LOGGER.error("getting the history")
-                _LOGGER.error(self.history[self.default_conversation_id])
             except:
                 _LOGGER.error("Error getting history: %s", err)
                 messages = []
@@ -214,7 +209,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         messages.append(user_message)
 
         try:
-            _LOGGER.error("making a query from async_process")
             query_response = await self.query(user_input, messages, exposed_entities, 0)
         except OpenAIError as err:
             _LOGGER.error(err)
@@ -239,8 +233,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
 
         messages.append(query_response.message.model_dump(exclude_none=True))
         self.history[conversation_id] = messages
-        _LOGGER.error("setting the history")
-        _LOGGER.error(self.history[conversation_id])
 
         self.hass.bus.async_fire(
             EVENT_CONVERSATION_FINISHED,
@@ -353,7 +345,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("about to make a query %s", user_input.conversation_id)
         """Process a sentence."""
         model = self.entry.options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL)
         max_tokens = self.entry.options.get(CONF_MAX_TOKENS, DEFAULT_MAX_TOKENS)
@@ -422,7 +413,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("executing a function call")
         function_name = message.function_call.name
         function = next(
             (s for s in self.get_functions() if s["spec"]["name"] == function_name),
@@ -448,7 +438,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         n_requests,
         function,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("executing a function")
         function_executor = get_function_executor(function["function"]["type"])
 
         try:
@@ -477,7 +466,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("executing tool calls")
         messages.append(message.model_dump(exclude_none=True))
         for tool in message.tool_calls:
             function_name = tool.function.name
@@ -512,7 +500,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         function,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("executing tool function")
+        _LOGGER.info("executing tool function")
         function_executor = get_function_executor(function["function"]["type"])
 
         try:
