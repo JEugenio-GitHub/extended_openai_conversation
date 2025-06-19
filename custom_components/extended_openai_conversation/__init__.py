@@ -203,7 +203,8 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
                 return conversation.ConversationResult(
                     response=intent_response, conversation_id=conversation_id
                 )
-            messages.append(system_message) 
+            if len(messages) == 0:
+                messages.append(system_message) 
         user_message = {"role": "user", "content": user_input.text}
         if self.entry.options.get(CONF_ATTACH_USERNAME, DEFAULT_ATTACH_USERNAME):
             user = user_input.context.user_id
