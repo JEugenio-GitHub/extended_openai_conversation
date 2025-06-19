@@ -213,6 +213,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         messages.append(user_message)
 
         try:
+            _LOGGER.error("making a query from async_process")
             query_response = await self.query(user_input, messages, exposed_entities, 0)
         except OpenAIError as err:
             _LOGGER.error(err)
@@ -258,7 +259,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
     def _generate_system_message(
         self, exposed_entities, user_input: conversation.ConversationInput
     ):
-        _LOGGER.error("generating the system message")
         raw_prompt = self.entry.options.get(CONF_PROMPT, DEFAULT_PROMPT)
         prompt = self._async_generate_prompt(raw_prompt, exposed_entities, user_input)
         return {"role": "system", "content": prompt}
@@ -280,7 +280,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         )
 
     def get_exposed_entities(self):
-        _LOGGER.error("getting the exposed entities")
         states = [
             state
             for state in self.hass.states.async_all()
@@ -307,7 +306,6 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         return exposed_entities
 
     def get_functions(self):
-        _LOGGER.error("getting the functions")
         try:
             function = self.entry.options.get(CONF_FUNCTIONS)
             result = yaml.safe_load(function) if function else DEFAULT_CONF_FUNCTIONS
@@ -354,7 +352,7 @@ class OpenAIAgent(conversation.AbstractConversationAgent):
         exposed_entities,
         n_requests,
     ) -> OpenAIQueryResponse:
-        _LOGGER.error("making a query")
+        _LOGGER.error("about to make a query")
         """Process a sentence."""
         model = self.entry.options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL)
         max_tokens = self.entry.options.get(CONF_MAX_TOKENS, DEFAULT_MAX_TOKENS)
